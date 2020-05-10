@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"test.blog.com/testBlog/common"
 	"test.blog.com/testBlog/model"
+	"test.blog.com/testBlog/response"
 )
 
 func AuthMiddleware() gin.HandlerFunc {
@@ -15,10 +16,7 @@ func AuthMiddleware() gin.HandlerFunc {
 
 		// 验证token是否需存在或是否以Bearer开头
 		if tokenString == "" || !strings.HasPrefix(tokenString, "Bearer ") {
-			ctx.JSON(http.StatusUnauthorized, gin.H{
-				"code": 401,
-				"msg":  "权限不足",
-			})
+			response.Response(ctx, http.StatusUnauthorized, 401, "权限不足", nil)
 			ctx.Abort()
 			return
 		}
@@ -29,10 +27,7 @@ func AuthMiddleware() gin.HandlerFunc {
 
 		// 验证token是否解析错误，或者token过期
 		if err != nil || !token.Valid {
-			ctx.JSON(http.StatusUnauthorized, gin.H{
-				"code": 401,
-				"msg":  "权限不足",
-			})
+			response.Response(ctx, http.StatusUnauthorized, 401, "权限不足", nil)
 			ctx.Abort()
 			return
 		}
@@ -43,10 +38,7 @@ func AuthMiddleware() gin.HandlerFunc {
 		DB.First(&user, claims.UserId)
 
 		if user.ID == 0 {
-			ctx.JSON(http.StatusUnauthorized, gin.H{
-				"code": 401,
-				"msg":  "权限不足",
-			})
+			response.Response(ctx, http.StatusUnauthorized, 401, "权限不足", nil)
 			ctx.Abort()
 			return
 		}
